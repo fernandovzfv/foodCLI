@@ -38,6 +38,11 @@ def modify_db(food_data: dict, supabase: Client, date_exists: str) -> None:
         row = supabase.table('feeding').insert(food_data).execute()
 
 
+def get_db(supabase: Client, date: str):
+    row = supabase.table('feeding').select('*').eq('date', date).execute()
+    return row
+
+
 def get_supabase() -> Client:
     """Get the supabase client
 

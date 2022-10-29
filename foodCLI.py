@@ -22,7 +22,7 @@ Scales:
 
 import supabase
 import typer
-from db import get_supabase, modify_db
+from db import get_supabase, modify_db, get_db
 """Import supabase client from db.py
 
 get_supabase: return supabase.Client object
@@ -72,7 +72,7 @@ def input_feeding(meal: str, current_date: str, current_info: dict) -> dict:
     char = meal[:1]
     food = {}
     food['date'] = current_date
-    
+    print('[' + meal + ']')
     # read information
     for i in range(5):
         column_db = char + '_m' + str(i+1)
@@ -108,7 +108,7 @@ def input_general_params(current_date: str, current_info: dict) -> dict:
     params = {}
     params['date'] = current_date
     
-    params['s_scale'] = int(get_user_input('s_scale',
+    params['s_level'] = int(get_user_input('s_level',
                                            'Input stressful scale (1-4)',
                                            current_info))
     params['sleep'] = int(get_user_input('sleep',
@@ -129,8 +129,8 @@ def input_general_params(current_date: str, current_info: dict) -> dict:
 
 def main(param: str):
     """Register of food ingestion.
-
-    params: breakfast, lunch, dinner, and general
+Use
+    params: breakfast, lunch, dinner, general, get, and insert.
     """
 
     print("<<FOOD REGISTER>>")
@@ -147,14 +147,29 @@ def main(param: str):
     
     meals = ['breakfast', 'lunch', 'dinner']
     if param in meals:
+        print('[Food]')
         food_data = input_feeding(param, current_date, current_info)
         modify_db(food_data, supabase, date_exists)
         print(f'Food: {food_data}')
+
+    elif param == 'insert':
+        print('[' + param + ']')
+        new_data = {}
+        for meal in meals:
+            new_data.update(input_feeding(meal, current_date, current_info))
+        new_data.update(input_general_params(current_date, current_info))
+        modify_db(new_data, supabase, date_exists)
+        print(new_data)
     
     elif param == 'general':
+        print('[' + param + ']')
         params = input_general_params(current_date, current_info)
         modify_db(params, supabase, date_exists)
         print(f'General params: {params}')
+
+    elif param == 'get':
+        print('[' + param + ']')
+        print(get_db(supabase, current_date))
     
     else:
         print(f'Unknown option: {param}')
