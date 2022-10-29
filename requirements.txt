@@ -1,0 +1,3 @@
+typer
+supabase
+python-dotnev
