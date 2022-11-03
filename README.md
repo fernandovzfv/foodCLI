@@ -4,7 +4,7 @@ Version 0.1.0
 ## Description
 This application is a script to register in a PostgreSQL database in [Supabase](https://supabase.com/) some parameters regarding food ingestion and other variables that could affect your health.
 
-The idea behind this simple application is to control an X-Variable (i.e., high blood pressure, gastritis, etc.) in the function of food ingestion.
+The idea behind this simple application is to control an X-Variable (i.e., high blood pressure, gastritis, etc.) in function of food ingestion.
 
 We'll register the following parameters:
 

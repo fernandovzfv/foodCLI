@@ -9,23 +9,16 @@ Todo:
 """
 
 from supabase import create_client, Client
-from dotenv import load
-import os
-
-# Load .env variables
-load()
-SUPABASE_URL = os.getenv('SUPABASE_URL')
-SUPABASE_KEY = os.getenv('SUPABASE_KEY')
-SUPABASE_SECRET_KEY = os.getenv('SUPABASE_SECRET_KEY')
 
 
-def modify_db(food_data: dict, supabase: Client, date_exists: str) -> None:
+def modify_data(food_data: dict, supabase: Client, date_exists: str, table: str = 'feeding') -> None:
     """Insert or update a supabase database row
 
     Args:
         food_data (dict): The database row data in the form of a dictionary
         supabase (supabase.Cliente): the supabase client
         date_exists (str): The date (as a string) if this already exists in the DB
+        table (str): Table name to modify
 
     Return:
         None
@@ -35,17 +28,29 @@ def modify_db(food_data: dict, supabase: Client, date_exists: str) -> None:
     """
     
     if date_exists:
-        row = supabase.table('feeding').update(food_data).eq('date', food_data['date']).execute()
+        row = supabase.table(table).update(food_data).eq('date', food_data['date']).execute()
     else:
-        row = supabase.table('feeding').insert(food_data).execute()
-
-
-def get_db(supabase: Client, date: str):
-    row = supabase.table('feeding').select('*').eq('date', date).execute()
+        row = supabase.table(table).insert(food_data).execute()
+    
     return row
 
 
-def get_supabase() -> Client:
+def get_data(supabase: Client, date: str, table: str = 'feeding'):
+    """_summary_
+
+    Args:
+        supabase (Client): _description_
+        date (str): _description_
+        table (str, optional): _description_. Defaults to 'feeding'.
+
+    Returns:
+        _type_: _description_
+    """
+    row = supabase.table(table).select('*').eq('date', date).execute()
+    return row
+
+
+def get_supabase(url: str, key: str) -> Client:
     """Get the supabase client
 
     Args:
@@ -58,4 +63,4 @@ def get_supabase() -> Client:
         * implement supabase url and supabase key as argument insted of general variables
         * Use a try/except block
     """
-    return create_client(SUPABASE_URL, SUPABASE_KEY)
+    return create_client(url, key)
