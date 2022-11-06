@@ -11,7 +11,7 @@ Todo:
 from supabase import create_client, Client
 
 
-def modify_data(food_data: dict, supabase: Client, date_exists: str, table: str = 'feeding') -> None:
+def modify_data(food_data: dict, supabase: Client, date_exists: str, table: str) -> None:
     """Insert or update a supabase database row
 
     Args:
@@ -35,7 +35,7 @@ def modify_data(food_data: dict, supabase: Client, date_exists: str, table: str 
     return row
 
 
-def get_data(supabase: Client, date: str, table: str = 'feeding'):
+def get_data(supabase: Client, date: str, table: str):
     """_summary_
 
     Args:

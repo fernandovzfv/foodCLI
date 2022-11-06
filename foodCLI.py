@@ -33,109 +33,13 @@ get_supabase: return supabase.Client object
 modify_db: insert or update database row
 """
 
+from input import get_user_input, input_feeding, input_general_params
 
 # Load .env variables
 load_dotenv()
 SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 SUPABASE_SECRET_KEY = os.getenv('SUPABASE_SECRET_KEY')
-
-
-def get_user_input(db_column: str, question: str, current_info: dict) -> str:
-    """Prepare the question for user, and read the anwer
-
-    Args:
-        db_column (str): database column name
-        question (str): question to ask
-        current_info (dict): existing database row or {} if none
-
-    Returns:
-        str: answer of the user.
-    """
-    
-    if current_info:
-        current_value = current_info[db_column]
-        question = question + " [" + str(current_value) + "]: "
-    else:
-        question = question + ": "
-    
-    answer = input(question)
-    if answer:
-        return answer
-    else:
-        if current_info:
-            return current_info[db_column]
-        else:
-            return ''
-
-
-def input_feeding(meal: str, current_date: str, current_info: dict) -> dict:
-    """Read the food ingestion to breakfast, lunch, or dinner
-
-    Args:
-        meal (str): It could be breakfast, lunch or dinner
-        current_date (str): date to register in the format "dd-mm-yyyy"
-        current_info (dict): existing database row or {} if none
-    
-    Return:
-        dict: database row information to register (partial)
-    """
-    char = meal[:1]
-    food = {}
-    food['date'] = current_date
-    print('[' + meal + ']')
-    # read information
-    for i in range(5):
-        column_db = char + '_m' + str(i+1)
-        meal = get_user_input(column_db, f"Describe meal No. {i+1}", current_info)
-        if meal:
-            food[column_db] = meal
-        else:
-            break
-    
-    column_db = char + '_sl'
-    sweety_scale = get_user_input(column_db, "Sweety scale (1-4)", current_info)
-    food[column_db] = int(sweety_scale)
-    
-    column_db = char + '_pl'
-    hot_scale = get_user_input(column_db, "Hot scale (1-4)", current_info)
-    food[column_db] = int(hot_scale)
-    
-    return food
-
-
-def input_general_params(current_date: str, current_info: dict) -> dict:
-    """Read the stressful scale, sleeping and resting hours,
-       x-variable scale, and notes
-
-    Args:
-        current_date (str): date to register in the format "dd-mm-yyyy"
-        current_info (dict): existing database row or {} if none
-    
-    Return:
-        dict: database row information to register (partial)
-    """
-
-    params = {}
-    params['date'] = current_date
-    
-    params['s_level'] = int(get_user_input('s_level',
-                                           'Input stressful scale (1-4)',
-                                           current_info))
-    params['sleep'] = int(get_user_input('sleep',
-                                         'Input sleeping hours',
-                                         current_info))
-    params['rest'] = int(get_user_input('rest',
-                                        'Input resting hours',
-                                        current_info))
-    params['x_var'] = int(get_user_input('x_var',
-                                        'Input X-variable value (1-4)',
-                                        current_info))
-    params['notes'] = get_user_input('notes',
-                                     'Input your comments',
-                                     current_info)
-    
-    return params
 
 
 def main(param: str):
@@ -168,7 +72,7 @@ Use
     if param in meals:
         print('[Food]')
         food_data = input_feeding(param, current_date, current_info)
-        modify_data(food_data, supabase, date_exists)
+        modify_data(food_data, supabase, date_exists, 'feeding')
         print(f'Food: {food_data}')
 
     elif param == 'insert':
@@ -177,13 +81,13 @@ Use
         for meal in meals:
             new_data.update(input_feeding(meal, current_date, current_info))
         new_data.update(input_general_params(current_date, current_info))
-        modify_data(new_data, supabase, date_exists)
+        modify_data(new_data, supabase, date_exists, 'feeding')
         print(new_data)
     
     elif param == 'general':
         print('[' + param + ']')
         params = input_general_params(current_date, current_info)
-        modify_data(params, supabase, date_exists)
+        modify_data(params, supabase, date_exists, 'feeding')
         print(f'General params: {params}')
 
     elif param == 'get':

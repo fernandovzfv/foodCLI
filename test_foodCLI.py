@@ -11,12 +11,16 @@ load_dotenv(dotenv_path='test.env')
 class TestSupabase(unittest.TestCase):
     def test_supabase(self):
         url = os.environ.get('SUPABASE_TEST_URL')
-        assert url is not None, "Must provide SUPERBASE_TEST_URL environment variable"
+        self.assertIsNotNone(url)
         key = os.environ.get('SUPABASE_TEST_KEY')
-        assert key is not None, "Must provide SUPERBASE_TEST_KEY environment variable"
+        self.assertIsNotNone(key)
         return get_supabase(url, key)
 
     def test_modify_data(self):
+        """Test de modify_data function
+
+        TODO: Correct that the information is duplicated in feeding and testing table after run test.
+        """
         _ = date.today()
         current_date = str(_.day) + '-' + str(_.month) + '-' + str(_.year)
         food_data = {'date': current_date, 'x_var': 4, 'notes': 'testing'}
@@ -26,8 +30,7 @@ class TestSupabase(unittest.TestCase):
         key = os.environ.get('SUPABASE_TEST_KEY')
         supabase = get_supabase(url, key)
         row = modify_data(food_data, supabase, date_exists, table)
-        assert len(row.data) == 1, "Error inserting data to DB"
-
+        self.assertEqual(len(row.data), 1)
 
 
 if __name__ == '__main__':
